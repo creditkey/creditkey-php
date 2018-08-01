@@ -1,8 +1,9 @@
 <?php
+    namespace CreditKey;
+    
     use PHPUnit\Framework\TestCase;
-    use CreditKey\Authentication;
 
-    final class AuthenticationTest extends TestCase
+    abstract class CreditKeyTestCase extends TestCase
     {
         protected $apiUrlBase;
         protected $publicKey;
@@ -18,19 +19,13 @@
             else
             {
                 $rake_output = shell_exec('cd ' . getenv('CREDITKEY_SOURCE_PATH') . ' && rake ck:test_support:sdk_authentication');
-                $config = json_decode($rake_output);
+                $items = explode(',', $rake_output);
 
-                $this->apiUrlBase = $config->api_url;
-                $this->publicKey = $config->public_key;
-                $this->sharedSecret = $config->shared_secret;
+                $this->apiUrlBase = $items[0];
+                $this->publicKey = $items[1];
+                $this->sharedSecret = $items[2];
             }
         }
-
-        public function testCanAuthenticate()
-        {
-            $this->assertEquals(true,
-                \CreditKey\Authentication::authenticate(
-                    $this->apiUrlBase, $this->publicKey, $this->sharedSecret, false));
-        }
     }
+
 ?>
