@@ -6,7 +6,7 @@
     {
         public static function authenticate()
         {
-            $result = \CreditKey\Api::post('/ecomm/authenticate.json', null);
+            $result = \CreditKey\Api::post('/ecomm/authenticate', null);
             return $result->success;
         }
     }
