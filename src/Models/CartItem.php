@@ -22,6 +22,12 @@
             $this->color = $color;
         }
 
+        public static function fromServiceData($data)
+        {
+            return new CartItem($data->merchant_product_id, $data->name, $data->price,
+                $data->sku, $data->quantity, $data->size, $data->color);
+        }
+
         public function getMerchantId()
         {
             return $this->merchantProductId;

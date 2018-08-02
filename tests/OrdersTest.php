@@ -12,21 +12,37 @@
             $cartContents = \CreditKey\TestSupport\CreditKeyTestData::cartContents();
             $charges = \CreditKey\TestSupport\CreditKeyTestData::charges();
 
-            $this->assertTrue(
-                \CreditKey\Orders::confirm($ckOrderId, $merchantOrderId, $merchantOrderStatus,
-                    $cartContents, $charges));
+            $order = \CreditKey\Orders::confirm($ckOrderId, $merchantOrderId, $merchantOrderStatus,
+                $cartContents, $charges);
+
+            $this->assertEquals('captured', $order->getCaptureStatus());
         }
 
-        public function testFind()
+        public function testFindOrder()
         {
-            $this->assertEquals(true,
-                \CreditKey\Orders::find(null));
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
+            $order = \CreditKey\Orders::find($ckOrderId);
+            $this->assertInstanceOf(\CreditKey\Models\Order::class, $order);
+            $this->assertNotEmpty($order->getOrderId());
+            $this->assertNotEmpty($order->getStatus());
+        }
+
+        public function testFindOrderByMerchantId()
+        {
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::confirmedOrder();
+            $originalOrder = \CreditKey\Orders::find($ckOrderId);
+
+            $order = \CreditKey\Orders::findByMerchantOrderId($originalOrder->getMerchantOrderId());
+            $this->assertInstanceOf(\CreditKey\Models\Order::class, $order);
+            $this->assertNotEmpty($order->getOrderId());
+            $this->assertNotEmpty($order->getStatus());
         }
 
         public function testCancel()
         {
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
-            $this->assertTrue(\CreditKey\Orders::cancel($ckOrderId));
+            $order = \CreditKey\Orders::cancel($ckOrderId);
+            $this->assertEquals('canceled', $order->getStatus());
         }
 
         public function testRefund()

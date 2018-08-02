@@ -21,6 +21,20 @@
             return self::$isConfigured;
         }
 
+        public static function get($url, $args)
+        {
+            $requestArgs = self::requestArgs($args);
+            $fullUrl = self::$apiUrlBase . $url . '?' . http_build_query($requestArgs);
+
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $fullUrl);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $result = json_decode(curl_exec($curl));
+            // fwrite(STDERR, print_r($result, true));
+
+            return $result;
+        }
+
         public static function post($url, $args)
         {
             if (!self::$isConfigured)
@@ -33,15 +47,7 @@
                 throw new Exception('php_curl extension is required');
             }
 
-            $auth = array(
-                'public_key' => self::$publicKey,
-                'shared_secret' => self::$sharedSecret
-            );
-
-            $fullArgs = isset($args)
-                ? array_merge($args, $auth)
-                : $auth;
-            $json = json_encode($fullArgs);
+            $json = json_encode(self::requestArgs($args));
 
             // fwrite(STDERR, print_r($fullArgs, true));
             $fullUrl = self::$apiUrlBase . $url;
@@ -55,11 +61,22 @@
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($json)
             ));
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // TODO: dont do this
             $result = json_decode(curl_exec($curl));
             // fwrite(STDERR, print_r($result, true));
 
             return $result;
+        }
+
+        private static function requestArgs($args)
+        {
+            $auth = array(
+                'public_key' => self::$publicKey,
+                'shared_secret' => self::$sharedSecret
+            );
+
+            return isset($args)
+                ? array_merge($args, $auth)
+                : $auth;
         }
     }
 ?>

@@ -1,5 +1,6 @@
 <?php
     namespace CreditKey;
+    use CreditKey\Models\CartItem;
 
     final class CartContents
     {
@@ -10,11 +11,20 @@
                 return null;
             }
 
-            $getFormData = function($cartItem) {
+            $buildFormData = function($cartItem) {
                 return $cartItem->toFormData();
             };
 
-            return array_map($getFormData, $cartContents);
+            return array_map($buildFormData, $cartContents);
+        }
+
+        public static function buildFromServiceData($dataItems)
+        {
+            $buildCartItem = function($data) {
+                return CartItem::fromServiceData($data);
+            };
+
+            return array_map($buildCartItem, $dataItems);
         }
     }
 ?>
