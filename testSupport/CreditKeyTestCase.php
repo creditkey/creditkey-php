@@ -1,16 +1,18 @@
 <?php
-    namespace CreditKey;
-    
+    namespace CreditKey\TestSupport;
+
     use PHPUnit\Framework\TestCase;
+    use CreditKey\Api;
 
     abstract class CreditKeyTestCase extends TestCase
     {
-        protected $apiUrlBase;
-        protected $publicKey;
-        protected $sharedSecret;
-
-        protected function setUp()
+        public static function setUpBeforeClass()
         {
+            if (\CreditKey\Api::isConfigured())
+            {
+                return;
+            }
+
             // TODO: Support for an external API
             if (getenv('CREDITKEY_SOURCE_PATH') == false)
             {
@@ -19,11 +21,9 @@
             else
             {
                 $rake_output = shell_exec('cd ' . getenv('CREDITKEY_SOURCE_PATH') . ' && rake ck:test_support:sdk_authentication');
-                $items = explode(',', $rake_output);
+                $config = json_decode($rake_output);
 
-                $this->apiUrlBase = $items[0];
-                $this->publicKey = $items[1];
-                $this->sharedSecret = $items[2];
+                \CreditKey\Api::configure($config->api_url, $config->public_key, $config->shared_secret);
             }
         }
     }
