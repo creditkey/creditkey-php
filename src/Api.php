@@ -56,9 +56,10 @@
                 'Content-Length: ' . strlen($json)
             ));
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // TODO: dont do this
-            $result = curl_exec($curl);
+            $result = json_decode(curl_exec($curl));
+            // fwrite(STDERR, print_r($result, true));
 
-            return json_decode($result);
+            return $result;
         }
     }
 ?>

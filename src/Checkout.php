@@ -32,7 +32,8 @@
 
         public static function completeCheckout($ckOrderId)
         {
-
+            $result = \CreditKey\Api::post('/ecomm/complete_checkout', array('id' => $ckOrderId));
+            return $result->success;
         }
     }
 ?>

@@ -34,8 +34,8 @@
 
         public function testCompleteCheckout()
         {
-            $this->assertEquals(true,
-                \CreditKey\Checkout::completeCheckout(null));
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::createCompletedApplication();
+            $this->assertTrue(\CreditKey\Checkout::completeCheckout($ckOrderId));
         }
     }
 ?>
