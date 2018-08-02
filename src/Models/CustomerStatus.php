@@ -1,53 +1,31 @@
 <?php
+    namespace CreditKey\Models;
 
-namespace CreditKey\Models;
-
-class CustomerStatus
-{
-    protected $merchantCustomerId;
-    protected $hasActiveCreditLine;
-    protected $cartContentsExceedCreditLimit;
-    protected $availableCredit;
-
-    public function getMerchantCustomerId()
+    class CustomerStatus
     {
-        return $merchantCustomerId;
-    }
+        protected $merchantCustomerId;
+        protected $hasActiveCreditLine;
+        protected $cartContentsExceedCreditLimit;
+        protected $availableCredit;
 
-    public function setMerchantCustomerId($setMerchantCustomerId)
-    {
-        $merchantCustomerId = $setMerchantCustomerId;
-    }
+        public function getMerchantCustomerId()
+        {
+            return $this->merchantCustomerId;
+        }
 
-    public function getHasActiveCreditLine()
-    {
-        return $hasActiveCreditLine;
-    }
+        public function getHasActiveCreditLine()
+        {
+            return $this->hasActiveCreditLine;
+        }
 
-    public function setHasActiveCreditLine($setHasActiveCreditLine)
-    {
-        $hasActiveCreditLine = $setHasActiveCreditLine;
-    }
+        public function getCartContentsExceedCreditLimit()
+        {
+            return $this->cartContentsExceedCreditLimit;
+        }
 
-    public function getCartContentsExceedCreditLimit()
-    {
-        return $cartContentsExceedCreditLimit;
+        public function getAvailableCredit()
+        {
+            return $this->availableCredit;
+        }
     }
-
-    public function setCartContentsExceedCreditLimit($setCartContentsExceedCreditLimit)
-    {
-        $cartContentsExceedCreditLimit = $setCartContentsExceedCreditLimit;
-    }
-
-    public function getAvailableCredit()
-    {
-        return $availableCredit;
-    }
-
-    public function setAvailableCredit($setAvailableCredit)
-    {
-        $availableCredit = $setAvailableCredit;
-    }
-}
-
 ?>

@@ -7,13 +7,27 @@
 
         public static function getApiConfiguration()
         {
-            $rake_output = CreditKeyTestData::executeRakeTask('ck:test_support:sdk_authentication');
+            $rake_output = self::executeRakeTask('ck:test_support:sdk_authentication');
             return json_decode($rake_output);
         }
 
-        public static function createCompletedApplication()
+        public static function completedApplication()
         {
-            $rake_output = CreditKeyTestData::executeRakeTask('ck:test_support:create_completed_application');
+            $rake_output = self::executeRakeTask('ck:test_support:create_completed_application');
+            $result = json_decode($rake_output);
+            return $result->id;
+        }
+
+        public static function newOrder()
+        {
+            $rake_output = self::executeRakeTask('ck:test_support:create_new_order');
+            $result = json_decode($rake_output);
+            return $result->id;
+        }
+
+        public static function confirmedOrder()
+        {
+            $rake_output = self::executeRakeTask('ck:test_support:create_confirmed_order');
             $result = json_decode($rake_output);
             return $result->id;
         }
@@ -25,7 +39,7 @@
 
         public static function executeRakeTask($task)
         {
-            return shell_exec('cd ' . self::getPathToSource() . ' && rake ' . $task);
+            return shell_exec('cd ' . self::getPathToSource() . ' && bundle exec rake ' . $task . ' 2>/dev/null');
         }
 
         private static function getPathToSource()

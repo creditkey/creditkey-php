@@ -1,75 +1,43 @@
 <?php
+    namespace CreditKey\Models;
 
-namespace CreditKey\Models;
-
-class Order
-{
-    protected $orderId;
-    protected $status;
-    protected $amount;
-    protected $originalAmount;
-    protected $refundAmount;
-    protected $items;
-
-    public function getOrderId()
+    class Order
     {
-        return $orderId;
-    }
+        protected $orderId;
+        protected $status;
+        protected $amount;
+        protected $originalAmount;
+        protected $refundAmount;
+        protected $items;
 
-    public function setOrderId($setOrderId)
-    {
-        $orderId = $setOrderId;
-    }
+        public function getOrderId()
+        {
+            return $this->orderId;
+        }
 
-    public function getStatus()
-    {
-        return $status;
-    }
+        public function getStatus()
+        {
+            return $this->status;
+        }
 
-    public function setStatus($setStatus)
-    {
-        $status = $setStatus;
-    }
+        public function getAmount()
+        {
+            return $this->amount;
+        }
 
-    public function getAmount()
-    {
-        return $amount;
-    }
+        public function getOriginalAmount()
+        {
+            return $this->originalAmount;
+        }
 
-    public function setAmount($setAmount)
-    {
-        $amount = $setAmount;
-    }
+        public function getRefundAmount()
+        {
+            return $this->refundAmount;
+        }
 
-    public function getOriginalAmount()
-    {
-        return $originalAmount;
+        public function getItems()
+        {
+            return $this->items;
+        }
     }
-
-    public function setOriginalAmount($setOriginalAmount)
-    {
-        $originalAmount = $setOriginalAmount;
-    }
-
-    public function getRefundAmount()
-    {
-        return $refundAmount;
-    }
-
-    public function setRefundAmount($setRefundAmount)
-    {
-        $refundAmount = $setRefundAmount;
-    }
-
-    public function getItems()
-    {
-        return $items;
-    }
-
-    public function setItems($setItems)
-    {
-        $items = $setItems;
-    }
-}
-
 ?>

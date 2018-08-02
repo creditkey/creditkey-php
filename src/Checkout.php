@@ -4,20 +4,11 @@
 
     final class Checkout
     {
-        private static function buildFormCartItems($cartContents)
-        {
-            $getFormData = function($cartItem) {
-                return $cartItem->toFormData();
-            };
-
-            return array_map($getFormData, $cartContents);
-        }
-
         public static function isDisplayedInCheckout($cartContents, $customerId)
         {
             $result = \CreditKey\Api::post('/ecomm/is_displayed_in_checkout',
                 array(
-                    'cart_items' => self::buildFormCartItems($cartContents),
+                    'cart_items' => \CreditKey\CartContents::buildFormCartItems($cartContents),
                     'remote_customer_id' => $customerId
                 ));
             return $result->is_displayed_in_checkout;
@@ -27,7 +18,7 @@
             $charges, $remoteId, $customerId, $returnUrl, $cancelUrl)
         {
             $formData = array(
-                'cart_items' => self::buildFormCartItems($cartContents),
+                'cart_items' => \CreditKey\CartContents::buildFormCartItems($cartContents),
                 'shipping_address' => $shippingAddress->toFormData(),
                 'billing_address' => $billingAddress->toFormData(),
                 'charges' => $charges->toFormData(),

@@ -17,8 +17,8 @@
             $billingAddress = \CreditKey\TestSupport\CreditKeyTestData::billingAddress();
             $shippingAddress = \CreditKey\TestSupport\CreditKeyTestData::shippingAddress();
             $charges = \CreditKey\TestSupport\CreditKeyTestData::charges();
-            $remoteId = rand();
-            $customerId = rand();
+            $remoteId = (string) rand();
+            $customerId = (string) rand();
             $returnUrl = 'http://www.myteststore.com/return_path_here';
             $cancelUrl = 'http://www.myteststore.com/cancel_path_here';
 
@@ -30,7 +30,7 @@
 
         public function testCompleteCheckout()
         {
-            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::createCompletedApplication();
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::completedApplication();
             $this->assertTrue(\CreditKey\Checkout::completeCheckout($ckOrderId));
         }
     }
