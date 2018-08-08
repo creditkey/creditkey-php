@@ -62,7 +62,7 @@
                 'Content-Length: ' . strlen($json)
             ));
             $result = json_decode(curl_exec($curl));
-            // fwrite(STDERR, print_r($result, true));
+            fwrite(STDERR, print_r($result, true));
 
             return $result;
         }

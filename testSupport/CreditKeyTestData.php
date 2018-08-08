@@ -68,13 +68,13 @@
         public static function billingAddress()
         {
             return new \CreditKey\Models\Address('Joe', 'Buyer', 'joebuyer@creditkey.com',
-                '700 E Ocean Blvd', 'Suite 2301', 'Long Beach', 'CA', '90802', '562-555-1212');
+                '145 S Fairfax Ave', 'Suite 200', 'Los Angeles', 'CA', '90036', '213-555-1212');
         }
 
         public static function shippingAddress()
         {
             return new \CreditKey\Models\Address('Joe', 'Receiver', 'joerecevier@creditkey.com',
-                '333 E 46th St', 'Apt 10E', 'New York', 'NY', '10017', '212-555-1212');
+                '15 Shatzell Ave', null, 'Rhinecliff', 'NY', '12574', '212-555-1212');
         }
 
         public static function charges()
