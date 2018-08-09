@@ -81,13 +81,11 @@
             $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 
             if ($status == 404)
-            {
                 throw new \CreditKey\Exceptions\NotFoundException();
-            }
+            else if ($status == 400)
+                throw new \CreditKey\Exceptions\InvalidRequestException();
             else if ($status != 200)
-            {
                 throw new \CreditKey\Exceptions\OperationErrorException();
-            }
 
             // fwrite(STDERR, print_r($result, true));
             return json_decode($response);
