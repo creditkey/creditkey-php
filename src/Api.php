@@ -29,9 +29,7 @@
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $fullUrl);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            $result = json_decode(curl_exec($curl));
-            // fwrite(STDERR, print_r($result, true));
-
+            $result = self::executeAndDecode($curl);
             return $result;
         }
 
@@ -61,9 +59,7 @@
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($json)
             ));
-            $result = json_decode(curl_exec($curl));
-            // fwrite(STDERR, print_r($result, true));
-
+            $result = self::executeAndDecode($curl);
             return $result;
         }
 
@@ -77,6 +73,24 @@
             return isset($args)
                 ? array_merge($args, $auth)
                 : $auth;
+        }
+
+        private static function executeAndDecode($curl)
+        {
+            $response = curl_exec($curl);
+            $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+
+            if ($status == 404)
+            {
+                throw new \CreditKey\Exceptions\NotFoundException();
+            }
+            else if ($status != 200)
+            {
+                throw new \CreditKey\Exceptions\OperationErrorException();
+            }
+
+            // fwrite(STDERR, print_r($result, true));
+            return json_decode($response);
         }
     }
 ?>

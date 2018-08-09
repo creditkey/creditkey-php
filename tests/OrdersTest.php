@@ -43,7 +43,7 @@
                 end($updatedCartItems)->getMerchantId());
         }
 
-        public function testFindOrder()
+        public function testRegularFindOrder()
         {
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
             $order = \CreditKey\Orders::find($ckOrderId);
@@ -61,6 +61,14 @@
             $this->assertInstanceOf(\CreditKey\Models\Order::class, $order);
             $this->assertNotEmpty($order->getOrderId());
             $this->assertNotEmpty($order->getStatus());
+        }
+
+        /**
+         * @expectedException \CreditKey\Exceptions\NotFoundException
+         */
+        public function testOrderNotFoundException()
+        {
+            \CreditKey\Orders::find('abcdefg');
         }
 
         public function testCancel()
