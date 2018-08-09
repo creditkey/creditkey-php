@@ -6,13 +6,15 @@
         protected $total;
         protected $shipping;
         protected $tax;
+        protected $discountAmount;
         protected $grandTotal;
 
-        function __construct($total, $shipping, $tax, $grandTotal)
+        function __construct($total, $shipping, $tax, $discountAmount, $grandTotal)
         {
             $this->total = $total;
             $this->shipping = $shipping;
             $this->tax = $tax;
+            $this->discountAmount = $discountAmount;
             $this->grandTotal = $grandTotal;
         }
 
@@ -31,6 +33,11 @@
             return $this->tax;
         }
 
+        public function getDiscountAmount()
+        {
+            return $this->discountAmount;
+        }
+
         public function getGrandTotal()
         {
             return $this->grandTotal;
@@ -42,6 +49,7 @@
                 'total' => $this->total,
                 'shipping' => $this->shipping,
                 'tax' => $this->tax,
+                'discount_amount' => $this->discountAmount,
                 'grand_total' => $this->grandTotal
             );
         }

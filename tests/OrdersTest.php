@@ -22,7 +22,7 @@
         {
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::confirmedOrder();
             $merchantOrderStatus = 'test_status';
-            $charges = new \CreditKey\Models\Charges(99.99, 9.99, 9.99, 119.97);
+            $charges = new \CreditKey\Models\Charges(99.99, 9.99, 9.99, 0, 119.97);
             $shippingAddress = new \CreditKey\Models\Address('Test', 'Tester', 'testtester@creditkey.com',
                 '100 Main Street', 'Apt A', 'New York', 'NY', '10017', '212-555-1212');
             $cartContents = \CreditKey\TestSupport\CreditKeyTestData::cartContents();

@@ -79,7 +79,7 @@
 
         public static function charges()
         {
-            return new \CreditKey\Models\Charges(2061.78, 49.00, 105.53, 2216.31);
+            return new \CreditKey\Models\Charges(2061.78, 49.00, 105.53, 0, 2216.31);
         }
     }
 ?>
