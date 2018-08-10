@@ -18,11 +18,12 @@
             return Order::fromServiceData($result);
         }
 
-        public static function update($ckOrderId, $merchantOrderStatus, $cartContents, $charges, $shippingAddress)
+        public static function update($ckOrderId, $merchantOrderStatus, $merchantOrderId, $cartContents, $charges, $shippingAddress)
         {
             $formData = array(
                 'id' => $ckOrderId,
-                'merchant_status' => $merchantOrderStatus
+                'merchant_status' => $merchantOrderStatus,
+                'merchant_order_id' => $merchantOrderId
             );
 
             if (!is_null($cartContents))

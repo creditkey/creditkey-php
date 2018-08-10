@@ -156,7 +156,7 @@ $isDisplayed = Checkout::isDisplayedInCheckout($cartContents, $customerId);
 
 ### beginCheckout
 
-This method should be called when the user selects Credit Key as a payment option to complete checkout.  This method should be called with all available customer information from the checkout page, and will return a unique [creditkey.com] URL that the merchant site should redirect the user to, in order to complete checkout.
+This method should be called when the user selects Credit Key as a payment option to complete checkout.  This method should be called with all available customer information from the checkout page, and will return a unique [creditkey.com](https://www.creditkey.com) URL that the merchant site should redirect the user to, in order to complete checkout.
 
 #### Parameters
 

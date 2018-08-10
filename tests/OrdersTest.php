@@ -29,7 +29,7 @@
             $newCartItem = new \CreditKey\Models\CartItem('999999', 'Test Adapter', 10.99, '9898928232', 1, null, null);
             array_push($cartContents, $newCartItem);
 
-            $order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, $cartContents, $charges, $shippingAddress);
+            $order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, null, $cartContents, $charges, $shippingAddress);
 
             $this->assertEquals($merchantOrderStatus,
                 $order->getMerchantStatus());
@@ -37,6 +37,8 @@
                 $order->getAmount());
             $this->assertEquals($shippingAddress->getEmail(),
                 $order->getShippingAddress()->getEmail());
+            $this->assertNotEquals(null,
+                $order->getMerchantOrderId());
 
             $updatedCartItems = $order->getItems();
             $this->assertEquals($newCartItem->getMerchantId(),
@@ -88,6 +90,14 @@
 
             $this->assertEquals($refundAmount,
                 $order->getRefundedAmount());
+        }
+
+        /**
+         * @expectedException \CreditKey\Exceptions\InvalidRequestException
+         */
+        public function testExceptionThrownFindWithoutId()
+        {
+            \CreditKey\Orders::find(null);
         }
     }
 ?>

@@ -33,5 +33,24 @@
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::completedApplication();
             $this->assertTrue(\CreditKey\Checkout::completeCheckout($ckOrderId));
         }
+
+        /**
+         * @expectedException \CreditKey\Exceptions\InvalidRequestException
+         */
+        public function testExceptionThrownBeginCheckoutMissingArgs()
+        {
+            $cartContents = \CreditKey\TestSupport\CreditKeyTestData::cartContents();
+            $billingAddress = \CreditKey\TestSupport\CreditKeyTestData::billingAddress();
+            $shippingAddress = null;
+            $charges = \CreditKey\TestSupport\CreditKeyTestData::charges();
+            $remoteId = (string) rand();
+            $customerId = (string) rand();
+            $returnUrl = 'http://www.myteststore.com/return_path_here';
+            $cancelUrl = 'http://www.myteststore.com/cancel_path_here';
+
+            $customerCheckoutUrl = \CreditKey\Checkout::beginCheckout($cartContents,
+                $billingAddress, $shippingAddress, $charges, $remoteId, $customerId,
+                $returnUrl, $cancelUrl);
+        }
     }
 ?>

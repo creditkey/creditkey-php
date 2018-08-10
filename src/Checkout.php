@@ -17,6 +17,11 @@
         public static function beginCheckout($cartContents, $billingAddress, $shippingAddress,
             $charges, $remoteId, $customerId, $returnUrl, $cancelUrl)
         {
+            if (is_null($cartContents) || is_null($billingAddress) || is_null($shippingAddress)
+                || is_null($charges) || is_null($remoteId) || is_null($returnUrl) || is_null($cancelUrl)) {
+                throw new \CreditKey\Exceptions\InvalidRequestException();
+            }
+
             $formData = array(
                 'cart_items' => \CreditKey\CartContents::buildFormCartItems($cartContents),
                 'shipping_address' => $shippingAddress->toFormData(),
