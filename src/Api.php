@@ -23,6 +23,11 @@
 
         public static function get($url, $args)
         {
+            if (!self::$isConfigured)
+            {
+                throw new ApiNotConfiguredException();
+            }
+
             $requestArgs = self::requestArgs($args);
             $fullUrl = self::$apiUrlBase . $url . '?' . http_build_query($requestArgs);
 
@@ -37,12 +42,7 @@
         {
             if (!self::$isConfigured)
             {
-                throw new Exception('Credit Key API is not configured');
-            }
-
-            if (!extension_loaded('curl'))
-            {
-                throw new Exception('php_curl extension is required');
+                throw new ApiNotConfiguredException();
             }
 
             $json = json_encode(self::requestArgs($args));

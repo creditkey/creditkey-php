@@ -6,15 +6,21 @@
 - [Requirements](#requirements)
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+- [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
+    - [Return URL](#return-url)
+    - [Cancel URL](#cancel-url)
 - [Models](#models)
     - [Address](#address)
     - [CartItem](#cartitem)
     - [Charges](#charges)
     - [Order](#order)
 - [Exceptions](#exceptions)
+    - [ApiNotConfiguredException](#apinotconfiguredexception)
+    - [InvalidRequestException](#invalidrequestexception)
     - [NotFoundException](#notfoundexception)
     - [OperationErrorException](#operationerrorexception)
 - [Authentication](#authentication)
+    - [configure](#configure)
     - [authenticate](#authenticate)
 - [Checkout Methods](#checkout-methods)
     - [isDisplayedInCheckout](#isdisplayedincheckout)
@@ -41,8 +47,35 @@ The Credit Key PHP SDK requires PHP 5.6 or higher, with the php_curl extension l
 ## Overview
 -----------
 
+[Credit Key](https://www.creditkey.com) checkout works similarly as services like [PayPal](https://www.paypal.com) in the sense that the user will be redirected to special checkout pages hosted on [creditkey.com](https://www.creditkey.com) to complete the checkout process.
+
+When rendering your checkout page, you should always call [\CreditKey\Checkout::isDisplayedInCheckout](#isdisplayedincheckout) to determine whether or not to display Credit Key as a payment option.
+
+When the user selects Credit Key as a payment option on your checkout page, you will need to call [\CreditKey\Checkout::beginCheckout](#begincheckout).  Using this method you will send information about the order to Credit Key, such as the items in the user's shopping cart, the total amount to be billed, the billing and shipping addresses specified by the user in checkout, and so forth.  This method will return a unique [creditkey.com](https://www.creditkey.com) URL which you should redirect the user's browser to, in order for them to complete the checkout process.
+
+After successful checkout on Credit Key's site, Credit Key will redirect the user's browser back to a unique URL provided by you to [beginCheckout](#begincheckout).  At this point you should call [\CreditKey\Checkout::completeCheckout](#completecheckout) to validate that the payment was successful and complete the order.  Upon successful return from [completeCheckout](#completecheckout), you should place the order in your system - then display your own order confirmation place to the user.
+
+When the order ships, you should call [\CreditKey\Orders::confirm](#confirm) to notify Credit Key that the order has shipped.  If [confirm](#confirm) isn't called for several days after completing checkout, Credit Key will automatically cancel the order in it's system and the payment will not be issued.
+
+If the order is canceled before shipment, you can call [\CreditKey\Orders::cancel](#cancel) to cancel the payment.  To issue a full or partial refund, use [\CreditKey\Orders::refund](#refund).
+
 ## Getting Started
 ------------------
+
+## Return to Merchant after Credit Key Checkout
+-----------------------------------------------
+
+You will need to implement at least one, possibly two, endpoints or controller actions on your system to receive users returning from Credit Key checkout.  These URL's are provided to Credit Key each time a user selects the option to check out with Credit Key, when calling [\CreditKey\Checkout::beginCheckout](#begincheckout).  They can be unique user-specific URL's.
+
+### Return URL
+
+The Return URL will be a URL on your system that Credit Key redirects the user's browser to after successful checkout.  When the user returns to this URL, you should validate the successful payment with Credit Key, complete the order in your system, and then display your order confirmation page.  Credit Key will not redirect a user to this URL if they have not successfully completed Credit Key checkout.
+
+We recommend creating a session-specific URL for each request that contains identifying information about the session, such as the primary key in your system used to refer to the user's checkout session.  This way you will easily be able to line up the Credit Key order with the user's shopping cart session.  However, if you track checkout sessions with cookies, a general URL might work in your scenario.
+
+### Cancel URL
+
+Credit Key will redirect users to the Cancel URL when checkout was not completed successfully - such as when the user canceled the Credit Key checkout session, or if the user was not able to be approved for a loan.  In many cases, you can simply provide the URL to your checkout page for the Cancel URL.  But if you want to take another action besides going back to the checkout page, or perform tracking, you can redirect elsewhere.
 
 ## Models
 ---------
@@ -126,6 +159,10 @@ $shippingAddress = $order->getShippingAddress();
 ## Exceptions
 -------------
 
+### ApiNotConfiguredException
+
+```\CreditKey\Exceptions\ApiNotConfiguredException``` is thrown if you attempt to call any SDK method before configuring the API endpoint and credentials using [\CreditKey\Api::configure](#configure).
+
 ### InvalidRequestException
 
 ```\CreditKey\Exceptions\InvalidRequestException``` is thrown when invalid parameters were passed by the consuming application to the SDK.
@@ -141,7 +178,21 @@ $shippingAddress = $order->getShippingAddress();
 ## Authentication
 -----------------
 
+### configure
+
+This method is used to provide the Credit Key PHP SDK with the API URL base, public key and shared secret - values which should have been provided to you by Credit Key support staff.  It is necessary to configure the API before calling any other SDK method.
+
+```
+\CreditKey\Api::configure($apiUrlBase, $publicKey, $sharedSecret);
+```
+
 ### authenticate
+
+This method can be used to determine whether valid API URL base, public key, and shared secret values have been provided - and the Credit Key API is up and reachable.  A boolean is returned.
+
+```
+$isSuccessful = \CreditKey\Authentication::authenticate();
+```
 
 ## Checkout Methods
 -------------------
@@ -188,13 +239,51 @@ $isAuthorized = \CreditKey\Checkout::completeCheckout($ckOrderId);
 
 ### confirm
 
+This method should be called when the order is shipped.  Send the updated ```$cartContents``` and ```$charges``` (in case they've changed since purchase), as well as the Order ID used by the merchant application (```$merchantOrderId```) and the order status in the merchant system (```$merchantOrderStatus```).  A [\CreditKey\Models\Order](#order) object is returned.
+
+```
+$order = \CreditKey\Orders::confirm($ckOrderId, $merchantOrderId, $merchantOrderStatus, $cartContents, $charges);
+```
+
 ### update
+
+This method can be used to update the ```$charges```, ```$cartContents```, ```$shippingAddress```, ```$merchantOrderId``` or ```$merchantOrderStatus``` at any time in Credit Key's system.  ```null``` can be sent for any parameter besides ```$ckOrderId``` if you do not with to update the values associated with that parameter.  A [\CreditKey\Models\Order](#order) object is returned.
+
+```
+$order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, $merchantOrderId, $charges, $shippingAddress);
+```
+
+We recommend calling this method immediately after checkout, as soon as a corresponding order is created in the merchant application, to provide Credit Key with the ```$merchantOrderId```.
 
 ### find
 
+Retreive order data from Credit Key using ```$ckOrderId```.  A [\CreditKey\Models\Order](#order) object is returned.  [\CreditKey\Exceptions\NotFoundException](#notfoundexception) is thrown if the order cannot be found.
+
+```
+$order = \CreditKey\Orders::find($ckOrderId);
+```
+
 ### findByMerchantId
+
+Retreive order data from Credit Key using the merchant application order ID.  If you have not provided the ```$merchantOrderId``` to Credit Key via a previous API call, this method will fail.  A [\CreditKey\Models\Order](#order) object is returned.  [\CreditKey\Exceptions\NotFoundException](#notfoundexception) is thrown if the order cannot be found.
+
+```
+$order = \CreditKey\Orders::findByMerchantOrderId($merchantOrderId);
+```
 
 ### cancel
 
+Cancel an order.  This method can only be called before [\CreditKey\Orders::confirm](#confirm) is called.  It will cancel the order.  This method is intended to be used when the order is canceled before shipment.  A [\CreditKey\Models\Order](#order) object is returned.
+
+```
+$order = \CreditKey\Orders::cancel($ckOrderId);
+```
+
 ### refund
 
+Issue either a partial or full refund to the customer.  ```$refundAmount``` should be a positive floating point value indicating the amount to refund.  A [\CreditKey\Models\Order](#order) object is returned.
+
+```
+$refundAmount = 29.99;
+$order = \CreditKey\Orders::refund($ckOrderId, $refundAmount);
+```
