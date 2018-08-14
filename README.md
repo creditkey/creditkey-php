@@ -9,6 +9,7 @@
 - [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
     - [Return URL](#return-url)
     - [Cancel URL](#cancel-url)
+    - [Actions Upon Return](#actions-upon-return)
 - [Models](#models)
     - [Address](#address)
     - [CartItem](#cartitem)
@@ -67,6 +68,8 @@ If the order is canceled before shipment, you can call [\CreditKey\Orders::cance
 
 You will need to implement at least one, possibly two, endpoints or controller actions on your system to receive users returning from Credit Key checkout.  These URL's are provided to Credit Key each time a user selects the option to check out with Credit Key, when calling [\CreditKey\Checkout::beginCheckout](#begincheckout).  They can be unique user-specific URL's.
 
+If the Cancel URL or Return URL you provide to Credit Key includes the string ```%CKKEY%```, upon redirect this string will be replaced with the Credit Key Order ID.
+
 ### Return URL
 
 The Return URL will be a URL on your system that Credit Key redirects the user's browser to after successful checkout.  When the user returns to this URL, you should validate the successful payment with Credit Key, complete the order in your system, and then display your order confirmation page.  Credit Key will not redirect a user to this URL if they have not successfully completed Credit Key checkout.
@@ -77,10 +80,18 @@ We recommend creating a session-specific URL for each request that contains iden
 
 Credit Key will redirect users to the Cancel URL when checkout was not completed successfully - such as when the user canceled the Credit Key checkout session, or if the user was not able to be approved for a loan.  In many cases, you can simply provide the URL to your checkout page for the Cancel URL.  But if you want to take another action besides going back to the checkout page, or perform tracking, you can redirect elsewhere.
 
+### Actions Upon Return
+
+In the endpoint you setup to handle the [Return URL](#return-url), you should take the following actions:
+
+1. Call [\CreditKey\Checkout::completeCheckout](#completecheckout), passing the Credit Key Order ID provided in the URL by Credit Key.  This method should return ```true``` to indicate the payment is authorized and you can continue placing the order.  If ```false``` is returned, or an [exception is thrown](#exceptions), you should return an error and you should not continue placing the order.
+2. Place the order as a new order in your system as an order with an authorized payment.
+3. Call [\CreditKey\Orders::update](#update) to provide Credit Key with your local merchant Order ID and Order Status.
+
 ## Models
 ---------
 
-Most SDK methods either accept one or more of these models as an argument, or return one as a result.  All models work the same in that field values can only be set by the constructor, and can be accessed by corresponding ```get``` methods.  All models documented here are under the ```\CreditKey\Models``` namespace.
+Most SDK methods either accept one or more of these models as an argument, or return one as a result.  All models are similar in that field values can only be set by the constructor, and can be accessed by corresponding ```get``` methods.  All models documented here are under the ```\CreditKey\Models``` namespace.
 
 ### Address
 
@@ -123,6 +134,8 @@ $color = $cartItem->getColor();
 ### Charges
 
 This object represents total order charges, discounts applied, tax and shipping amounts. ```$total``` refers to the subtotal (without shipping and taxes), and ```$grandTotal``` refers to the grand total after shipping, taxes, and discounts applied.  Each field should be a floating point value.
+
+```$shipping```, ```$tax```, and ```$discountAmount``` can be ```null``` or ```0``` if the value is not applicable to this purchase.
 
 ```
 $charges = new \CreditKey\Models\Charges($total, $shipping, $tax, $discountAmount, $grandTotal);
@@ -217,8 +230,8 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$charges** - Required - a [\CreditKey\Models\Charges](#charges) object describing the order amount, shipping and tax amouts, and any discounts applied.
 * **$remoteId** - Required - a unique ID in the merchant application to refer to this user's checkout session.  When Credit Key redirects back to the merchant site after a successful checkout, this ID will be referred to.
 * **$customerId** - Optional - a unique ID in the merchant application to refer to the user, if the user is logged in.  Can be ```null```.
-* **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. TODO- Link to section describing return URL process
-* **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.
+* **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. See the section on the [Return Url](#return-url) for additional information.
+* **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the s3ection on the [Cancel URL](#cancel-url) for additional information.
 
 #### Example
 
@@ -228,11 +241,13 @@ $redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress
 
 ### completeCheckout
 
-After a successful checkout, Credit Key will redirect back to the merchant website where the payment will be validated, and the order will be placed.  This method completes this checkout process when the order is placed.  If this method is not called by the merchant for an order, even if the customer successfully completed Credit Key's checkout, then the payment will not be made.  ```$ckOrderId``` refers to the unique Credit Key order ID that was returned on redirect back to the merchant site.  A boolean is returned describing whether the payment was successfully authorized.  TODO: link to section describing checkout process.
+After a successful checkout, Credit Key will redirect back to the merchant website where the payment will be validated, and the order will be placed.  This method completes this checkout process when the order is placed.  If this method is not called by the merchant for an order, even if the customer successfully completed Credit Key's checkout, then the payment will not be made.  ```$ckOrderId``` refers to the unique Credit Key order ID that was returned on redirect back to the merchant site.  A boolean is returned describing whether the payment was successfully authorized.  See [Actions Upon Return](#actions-upon-return) for additional information.
 
 ```
 $isAuthorized = \CreditKey\Checkout::completeCheckout($ckOrderId);
 ```
+
+If ```false``` is returned here or an [exception is thrown](#exceptions), you should not treat the order as a valid order.
 
 ## Order Management Methods
 ---------------------------
