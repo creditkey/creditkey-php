@@ -27,6 +27,15 @@
             $this->phoneNumber = $phoneNumber;
         }
 
+        public static function fromServiceData($data)
+        {
+            if (is_null($data))
+                return null;
+            else
+                return new Address($data->first_name, $data->last_name, $data->email, $data->address1,
+                    $data->address2, $data->city, $data->state, $data->zip, $data->phone_number);
+        }
+
         public function getFirstName()
         {
             return $this->firstName;
