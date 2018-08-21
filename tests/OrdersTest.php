@@ -52,6 +52,7 @@
             $this->assertInstanceOf(\CreditKey\Models\Order::class, $order);
             $this->assertNotEmpty($order->getOrderId());
             $this->assertNotEmpty($order->getStatus());
+            $this->assertNotEmpty($order->getShippingAddress()->getFirstName());
         }
 
         public function testFindOrderByMerchantId()

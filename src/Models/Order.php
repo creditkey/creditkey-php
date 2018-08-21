@@ -32,11 +32,7 @@
         public static function fromServiceData($data)
         {
             $cartItems = CartContents::buildFromServiceData($data->items);
-
-            $shippingAddress = new Address($data->shipping_first_name, $data->shipping_last_name,
-                $data->shipping_email, $data->shipping_address1, $data->shipping_address2,
-                $data->shipping_city, $data->shipping_state, $data->shipping_zip,
-                $data->shipping_phone);
+            $shippingAddress = Address::fromServiceData($data->shipping_address);
 
             return new Order($data->id, $data->status, $data->capture_status, $data->amount,
                 $data->refunded_amount, $cartItems, $data->merchant_order_id,
