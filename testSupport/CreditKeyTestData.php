@@ -67,13 +67,13 @@
 
         public static function billingAddress()
         {
-            return new \CreditKey\Models\Address('Joe', 'Buyer', 'joebuyer@creditkey.com',
+            return new \CreditKey\Models\Address('Joe', 'Buyer', null, 'joebuyer@creditkey.com',
                 '145 S Fairfax Ave', 'Suite 200', 'Los Angeles', 'CA', '90036', '213-555-1212');
         }
 
         public static function shippingAddress()
         {
-            return new \CreditKey\Models\Address('Joe', 'Receiver', 'joerecevier@creditkey.com',
+            return new \CreditKey\Models\Address('Joe', 'Receiver', null, 'joerecevier@creditkey.com',
                 '15 Shatzell Ave', null, 'Rhinecliff', 'NY', '12574', '212-555-1212');
         }
 

@@ -25,7 +25,7 @@
         {
             if (!self::$isConfigured)
             {
-                throw new ApiNotConfiguredException();
+                throw new \CreditKey\Exceptions\ApiNotConfiguredException();
             }
 
             $requestArgs = self::requestArgs($args);
@@ -42,7 +42,7 @@
         {
             if (!self::$isConfigured)
             {
-                throw new ApiNotConfiguredException();
+                throw new \CreditKey\Exceptions\ApiNotConfiguredException();
             }
 
             $json = json_encode(self::requestArgs($args));

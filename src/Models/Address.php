@@ -5,6 +5,7 @@
     {
         protected $firstName;
         protected $lastName;
+        protected $companyName;
         protected $email;
         protected $address1;
         protected $address2;
@@ -13,11 +14,12 @@
         protected $zip;
         protected $phoneNumber;
 
-        function __construct($firstName, $lastName, $email, $address1, $address2, $city,
+        function __construct($firstName, $lastName, $companyName, $email, $address1, $address2, $city,
             $state, $zip, $phoneNumber)
         {
             $this->firstName = $firstName;
             $this->lastName = $lastName;
+            $this->companyName = $companyName;
             $this->email = $email;
             $this->address1 = $address1;
             $this->address2 = $address2;
@@ -32,7 +34,7 @@
             if (is_null($data))
                 return null;
             else
-                return new Address($data->first_name, $data->last_name, $data->email, $data->address1,
+                return new Address($data->first_name, $data->last_name, $data->company_name, $data->email, $data->address1,
                     $data->address2, $data->city, $data->state, $data->zip, $data->phone_number);
         }
 
@@ -44,6 +46,11 @@
         public function getLastName()
         {
             return $this->lastName;
+        }
+
+        public function getCompanyName()
+        {
+            return $this->companyName;
         }
 
         public function getEmail()
@@ -86,6 +93,7 @@
             return array(
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
+                'company_name' => $this->companyName,
                 'email' => $this->email,
                 'address1' => $this->address1,
                 'address2' => $this->address2,

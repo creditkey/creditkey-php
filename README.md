@@ -98,12 +98,13 @@ Most SDK methods either accept one or more of these models as an argument, or re
 This object is used to represent either a billing or shipping address.
 
 ```
-$billingAddress = new \CreditKey\Models\Address($firstName, $lastName, $email, $address1, $address2, $city, $state, $zip, $phoneNumber);
+$billingAddress = new \CreditKey\Models\Address($firstName, $lastName, $companyName, $email, $address1, $address2, $city, $state, $zip, $phoneNumber);
 ```
 
 ```
 $firstName = $billingAddress->getFirstName();
 $lastName = $billingAddress->getLastName();
+$companyName = $billingAddress->getCompanyName();
 $email = $billingAddress->getEmail();
 $address1 = $billingAddress->getAddress1();
 $address2 = $billingAddress->getAddress2();
@@ -265,7 +266,7 @@ $order = \CreditKey\Orders::confirm($ckOrderId, $merchantOrderId, $merchantOrder
 This method can be used to update the ```$charges```, ```$cartContents```, ```$shippingAddress```, ```$merchantOrderId``` or ```$merchantOrderStatus``` at any time in Credit Key's system.  ```null``` can be sent for any parameter besides ```$ckOrderId``` if you do not with to update the values associated with that parameter.  A [\CreditKey\Models\Order](#order) object is returned.
 
 ```
-$order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, $merchantOrderId, $charges, $shippingAddress);
+$order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, $merchantOrderId, $cartContents, $charges, $shippingAddress);
 ```
 
 We recommend calling this method immediately after checkout, as soon as a corresponding order is created in the merchant application, to provide Credit Key with the ```$merchantOrderId```.
