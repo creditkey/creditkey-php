@@ -3,6 +3,8 @@
 
     final class CreditKeyTestData
     {
+        const API_ENDPOINT = \CreditKey\Api::LOCAL_DEVELOPMENT;
+
         private static $pathToSource;
 
         public static function getApiConfiguration()

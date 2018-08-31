@@ -1,6 +1,6 @@
 {
     "name": "creditkey/creditkey-php",
-    "version": "0.9.2",
+    "version": "1.0.0",
     "description": "Credit Key PHP SDK",
     "autoload": {
         "psr-4": {

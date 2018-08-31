@@ -3,6 +3,10 @@
 
     final class Api
     {
+        const PRODUCTION = 'https://www.creditkey.com/app';
+        const STAGING = 'https://staging.creditkey.com/app';
+        const LOCAL_DEVELOPMENT = 'http://localhost:9100';
+
         private static $isConfigured = false;
         private static $apiUrlBase;
         private static $publicKey;

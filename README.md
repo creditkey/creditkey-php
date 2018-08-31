@@ -5,13 +5,13 @@
 - [Support](#support)
 - [Requirements](#requirements)
 - [Overview](#overview)
-- [Getting Started](#getting-started)
-    - [With Composer](#with-composer)
-    - [Without Composer](#without-composer)
 - [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
     - [Return URL](#return-url)
     - [Cancel URL](#cancel-url)
     - [Actions Upon Return](#actions-upon-return)
+- [Getting Started](#getting-started)
+    - [With Composer](#with-composer)
+    - [Without Composer](#without-composer)
 - [Models](#models)
     - [Address](#address)
     - [CartItem](#cartitem)
@@ -63,6 +63,31 @@ When the order ships, you should call [\CreditKey\Orders::confirm](#confirm) to 
 
 If the order is canceled before shipment, you can call [\CreditKey\Orders::cancel](#cancel) to cancel the payment.  To issue a full or partial refund, use [\CreditKey\Orders::refund](#refund).
 
+## Return to Merchant after Credit Key Checkout
+-----------------------------------------------
+
+You will need to implement at least one, possibly two, endpoints or controller actions on your system to receive users returning from Credit Key checkout.  These URL's are provided to Credit Key each time a user selects the option to check out with Credit Key, when calling [\CreditKey\Checkout::beginCheckout](#begincheckout).  They can be unique user-specific URL's.
+
+If the Cancel URL or Return URL you provide to Credit Key include the string ```%CKKEY%```, then upon redirect this string will be replaced with the Credit Key Order ID.
+
+### Return URL
+
+The Return URL will be a URL on your system that Credit Key redirects the user's browser to after successful checkout.  When the user returns to this URL, you should validate the successful payment with Credit Key, complete the order in your system, and then display your order confirmation page.  Credit Key will not redirect a user to this URL if they have not successfully completed Credit Key checkout.
+
+We recommend creating a session-specific URL for each request that contains identifying information about the session, such as the primary key in your system used to refer to the user's checkout session.  This way you will easily be able to line up the Credit Key order with the user's shopping cart session.  However, if you track checkout sessions with cookies, a general URL might work in your scenario.
+
+### Cancel URL
+
+Credit Key will redirect users to the Cancel URL when checkout was not completed successfully - such as when the user canceled the Credit Key checkout session, or if the user was not able to be approved for a loan.  In many cases, you can simply provide the URL to your checkout page for the Cancel URL.  But if you want to take another action besides going back to the checkout page, or perform tracking, you can redirect elsewhere.
+
+### Actions Upon Return
+
+In the endpoint you setup to handle the [Return URL](#return-url), you should take the following actions:
+
+1. Call [\CreditKey\Checkout::completeCheckout](#completecheckout), passing the Credit Key Order ID provided in the URL by Credit Key.  This method should return ```true``` to indicate the payment is authorized and you can continue placing the order.  If ```false``` is returned, or an [exception is thrown](#exceptions), you should return an error and you should not continue placing the order.
+2. Place the order as a new order in your system as an order with an authorized payment.
+3. Call [\CreditKey\Orders::update](#update) to provide Credit Key with your local merchant Order ID and Order Status.
+
 ## Getting Started
 ------------------
 
@@ -84,31 +109,6 @@ If you do not want to use Composer, you can load the bindings by including the `
 ```
 require_once('/path/to/creditkey-php/init.php');
 ```
-
-## Return to Merchant after Credit Key Checkout
------------------------------------------------
-
-You will need to implement at least one, possibly two, endpoints or controller actions on your system to receive users returning from Credit Key checkout.  These URL's are provided to Credit Key each time a user selects the option to check out with Credit Key, when calling [\CreditKey\Checkout::beginCheckout](#begincheckout).  They can be unique user-specific URL's.
-
-If the Cancel URL or Return URL you provide to Credit Key includes the string ```%CKKEY%```, upon redirect this string will be replaced with the Credit Key Order ID.
-
-### Return URL
-
-The Return URL will be a URL on your system that Credit Key redirects the user's browser to after successful checkout.  When the user returns to this URL, you should validate the successful payment with Credit Key, complete the order in your system, and then display your order confirmation page.  Credit Key will not redirect a user to this URL if they have not successfully completed Credit Key checkout.
-
-We recommend creating a session-specific URL for each request that contains identifying information about the session, such as the primary key in your system used to refer to the user's checkout session.  This way you will easily be able to line up the Credit Key order with the user's shopping cart session.  However, if you track checkout sessions with cookies, a general URL might work in your scenario.
-
-### Cancel URL
-
-Credit Key will redirect users to the Cancel URL when checkout was not completed successfully - such as when the user canceled the Credit Key checkout session, or if the user was not able to be approved for a loan.  In many cases, you can simply provide the URL to your checkout page for the Cancel URL.  But if you want to take another action besides going back to the checkout page, or perform tracking, you can redirect elsewhere.
-
-### Actions Upon Return
-
-In the endpoint you setup to handle the [Return URL](#return-url), you should take the following actions:
-
-1. Call [\CreditKey\Checkout::completeCheckout](#completecheckout), passing the Credit Key Order ID provided in the URL by Credit Key.  This method should return ```true``` to indicate the payment is authorized and you can continue placing the order.  If ```false``` is returned, or an [exception is thrown](#exceptions), you should return an error and you should not continue placing the order.
-2. Place the order as a new order in your system as an order with an authorized payment.
-3. Call [\CreditKey\Orders::update](#update) to provide Credit Key with your local merchant Order ID and Order Status.
 
 ## Models
 ---------
@@ -195,6 +195,8 @@ $shippingAddress = $order->getShippingAddress();
 ## Exceptions
 -------------
 
+The following common exceptions are thrown by Credit Key SDK methods when various errors are encountered.
+
 ### ApiNotConfiguredException
 
 ```\CreditKey\Exceptions\ApiNotConfiguredException``` is thrown if you attempt to call any SDK method before configuring the API endpoint and credentials using [\CreditKey\Api::configure](#configure).
@@ -220,7 +222,9 @@ $shippingAddress = $order->getShippingAddress();
 
 ### configure
 
-This method is used to provide the Credit Key PHP SDK with the API URL base, public key and shared secret - values which should have been provided to you by Credit Key support staff.  It is necessary to configure the API before calling any other SDK method.
+This method is used to provide the Credit Key PHP SDK with the API environment to connect to, and your given public key and shared secret.  The public key and shared secret values which should be provided to you by Credit Key support staff.  It is necessary to configure the API before calling any other SDK method.
+
+The first parameter specifies which API environment should be connected to.  Valid values are ```\CreditKey\Api::PRODUCTION```, ```\CreditKey\Api::STAGING```, and ```\CreditKey\Api::LOCAL_DEVELOPMENT```.
 
 ```
 \CreditKey\Api::configure($apiUrlBase, $publicKey, $sharedSecret);
@@ -228,7 +232,7 @@ This method is used to provide the Credit Key PHP SDK with the API URL base, pub
 
 ### authenticate
 
-This method can be used to determine whether valid API URL base, public key, and shared secret values have been provided - and the Credit Key API is up and reachable.  A boolean is returned.
+This method can be used to determine whether valid public key and shared secret values have been provided - and the Credit Key API is up and reachable.  A boolean is returned.
 
 ```
 $isSuccessful = \CreditKey\Authentication::authenticate();

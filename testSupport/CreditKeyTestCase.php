@@ -14,8 +14,8 @@
 
             // TODO: Support for an external API
             $config = CreditKeyTestData::getApiConfiguration();
-            \CreditKey\Api::configure($config->api_url, $config->public_key,
-                $config->shared_secret);
+            \CreditKey\Api::configure(\CreditKey\TestSupport\CreditKeyTestData::API_ENDPOINT,
+                $config->public_key, $config->shared_secret);
         }
     }
 ?>
