@@ -6,6 +6,8 @@
 - [Requirements](#requirements)
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+    - [With Composer](#with-composer)
+    - [Without Composer](#without-composer)
 - [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
     - [Return URL](#return-url)
     - [Cancel URL](#cancel-url)
@@ -17,6 +19,7 @@
     - [Order](#order)
 - [Exceptions](#exceptions)
     - [ApiNotConfiguredException](#apinotconfiguredexception)
+    - [ApiUnauthorizedException](#apiunauthorizedexception)
     - [InvalidRequestException](#invalidrequestexception)
     - [NotFoundException](#notfoundexception)
     - [OperationErrorException](#operationerrorexception)
@@ -62,6 +65,25 @@ If the order is canceled before shipment, you can call [\CreditKey\Orders::cance
 
 ## Getting Started
 ------------------
+
+### With Composer
+
+If your project uses the [Composer](https://getcomposer.org) dependency manager, you can include the Credit Key PHP SDK by executing the following from the command-line:
+
+```
+% composer config repositories.creditkey composer https://composer.creditkey.com
+% composer require creditkey/b2bgateway
+```
+
+Composer's autoload should then automatically load the bindings.
+
+### Without Composer
+
+If you do not want to use Composer, you can load the bindings by including the ```init.php``` file:
+
+```
+require_once('/path/to/creditkey-php/init.php');
+```
 
 ## Return to Merchant after Credit Key Checkout
 -----------------------------------------------
@@ -176,6 +198,10 @@ $shippingAddress = $order->getShippingAddress();
 ### ApiNotConfiguredException
 
 ```\CreditKey\Exceptions\ApiNotConfiguredException``` is thrown if you attempt to call any SDK method before configuring the API endpoint and credentials using [\CreditKey\Api::configure](#configure).
+
+### ApiUnauthorizedException
+
+```\CreditKey\Exceptions\ApiUnauthorizedException``` is thrown when the API has been configured with an invalid Public Key/Shared Secret combination.
 
 ### InvalidRequestException
 

@@ -6,8 +6,15 @@
     {
         public static function authenticate()
         {
-            $result = \CreditKey\Api::post('/ecomm/authenticate', null);
-            return $result->success;
+            try
+            {
+                $result = \CreditKey\Api::post('/ecomm/authenticate', null);
+                return $result->success;
+            }
+            catch (\CreditKey\Exceptions\ApiUnauthorizedException $e)
+            {
+                return false;
+            }
         }
     }
 ?>

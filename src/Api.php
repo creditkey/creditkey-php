@@ -80,7 +80,9 @@
             $response = curl_exec($curl);
             $status = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 
-            if ($status == 404)
+            if ($status == 401)
+                throw new \CreditKey\Exceptions\ApiUnauthorizedException();
+            else if ($status == 404)
                 throw new \CreditKey\Exceptions\NotFoundException();
             else if ($status == 400)
                 throw new \CreditKey\Exceptions\InvalidRequestException();
