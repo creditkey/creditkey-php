@@ -227,7 +227,7 @@ This method is used to provide the Credit Key PHP SDK with the API environment t
 The first parameter specifies which API environment should be connected to.  Valid values are ```\CreditKey\Api::PRODUCTION```, ```\CreditKey\Api::STAGING```, and ```\CreditKey\Api::LOCAL_DEVELOPMENT```.
 
 ```
-\CreditKey\Api::configure($apiUrlBase, $publicKey, $sharedSecret);
+\CreditKey\Api::configure(\CreditKey\Api::PRODUCTION, $publicKey, $sharedSecret);
 ```
 
 ### authenticate
@@ -246,7 +246,7 @@ $isSuccessful = \CreditKey\Authentication::authenticate();
 This method should be called as the Checkout page is rendered, to determine whether or not to offer Credit Key as a payment option to the user. ```$cartContents``` should be an array of [\CreditKey\Models\CartItem](#cartitem), and ```$customerId``` should be the unique key on the merchant site to refer to this user if they are logged in.  For guest checkout, ```$customerId``` should be ```null```.
 
 ```
-$isDisplayed = Checkout::isDisplayedInCheckout($cartContents, $customerId);
+$isDisplayed = \CreditKey\Checkout::isDisplayedInCheckout($cartContents, $customerId);
 ```
 
 ### beginCheckout
