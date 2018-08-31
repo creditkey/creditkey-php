@@ -5,11 +5,13 @@
 - [Support](#support)
 - [Requirements](#requirements)
 - [Overview](#overview)
-- [Getting Started](#getting-started)
 - [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
     - [Return URL](#return-url)
     - [Cancel URL](#cancel-url)
     - [Actions Upon Return](#actions-upon-return)
+- [Getting Started](#getting-started)
+    - [With Composer](#with-composer)
+    - [Without Composer](#without-composer)
 - [Models](#models)
     - [Address](#address)
     - [CartItem](#cartitem)
@@ -17,6 +19,7 @@
     - [Order](#order)
 - [Exceptions](#exceptions)
     - [ApiNotConfiguredException](#apinotconfiguredexception)
+    - [ApiUnauthorizedException](#apiunauthorizedexception)
     - [InvalidRequestException](#invalidrequestexception)
     - [NotFoundException](#notfoundexception)
     - [OperationErrorException](#operationerrorexception)
@@ -60,15 +63,12 @@ When the order ships, you should call [\CreditKey\Orders::confirm](#confirm) to 
 
 If the order is canceled before shipment, you can call [\CreditKey\Orders::cancel](#cancel) to cancel the payment.  To issue a full or partial refund, use [\CreditKey\Orders::refund](#refund).
 
-## Getting Started
-------------------
-
 ## Return to Merchant after Credit Key Checkout
 -----------------------------------------------
 
 You will need to implement at least one, possibly two, endpoints or controller actions on your system to receive users returning from Credit Key checkout.  These URL's are provided to Credit Key each time a user selects the option to check out with Credit Key, when calling [\CreditKey\Checkout::beginCheckout](#begincheckout).  They can be unique user-specific URL's.
 
-If the Cancel URL or Return URL you provide to Credit Key includes the string ```%CKKEY%```, upon redirect this string will be replaced with the Credit Key Order ID.
+If the Cancel URL or Return URL you provide to Credit Key include the string ```%CKKEY%```, then upon redirect this string will be replaced with the Credit Key Order ID.
 
 ### Return URL
 
@@ -87,6 +87,28 @@ In the endpoint you setup to handle the [Return URL](#return-url), you should ta
 1. Call [\CreditKey\Checkout::completeCheckout](#completecheckout), passing the Credit Key Order ID provided in the URL by Credit Key.  This method should return ```true``` to indicate the payment is authorized and you can continue placing the order.  If ```false``` is returned, or an [exception is thrown](#exceptions), you should return an error and you should not continue placing the order.
 2. Place the order as a new order in your system as an order with an authorized payment.
 3. Call [\CreditKey\Orders::update](#update) to provide Credit Key with your local merchant Order ID and Order Status.
+
+## Getting Started
+------------------
+
+### With Composer
+
+If your project uses the [Composer](https://getcomposer.org) dependency manager, you can include the Credit Key PHP SDK by executing the following from the command-line:
+
+```
+% composer config repositories.creditkey composer https://composer.creditkey.com
+% composer require creditkey/b2bgateway
+```
+
+Composer's autoload should then automatically load the bindings.
+
+### Without Composer
+
+If you do not want to use Composer, you can load the bindings by including the ```init.php``` file:
+
+```
+require_once('/path/to/creditkey-php/init.php');
+```
 
 ## Models
 ---------
@@ -173,9 +195,15 @@ $shippingAddress = $order->getShippingAddress();
 ## Exceptions
 -------------
 
+The following common exceptions are thrown by Credit Key SDK methods when various errors are encountered.
+
 ### ApiNotConfiguredException
 
 ```\CreditKey\Exceptions\ApiNotConfiguredException``` is thrown if you attempt to call any SDK method before configuring the API endpoint and credentials using [\CreditKey\Api::configure](#configure).
+
+### ApiUnauthorizedException
+
+```\CreditKey\Exceptions\ApiUnauthorizedException``` is thrown when the API has been configured with an invalid Public Key/Shared Secret combination.
 
 ### InvalidRequestException
 
@@ -194,15 +222,17 @@ $shippingAddress = $order->getShippingAddress();
 
 ### configure
 
-This method is used to provide the Credit Key PHP SDK with the API URL base, public key and shared secret - values which should have been provided to you by Credit Key support staff.  It is necessary to configure the API before calling any other SDK method.
+This method is used to provide the Credit Key PHP SDK with the API environment to connect to, and your given public key and shared secret.  The public key and shared secret values which should be provided to you by Credit Key support staff.  It is necessary to configure the API before calling any other SDK method.
+
+The first parameter specifies which API environment should be connected to.  Valid values are ```\CreditKey\Api::PRODUCTION```, ```\CreditKey\Api::STAGING```, and ```\CreditKey\Api::LOCAL_DEVELOPMENT```.
 
 ```
-\CreditKey\Api::configure($apiUrlBase, $publicKey, $sharedSecret);
+\CreditKey\Api::configure(\CreditKey\Api::PRODUCTION, $publicKey, $sharedSecret);
 ```
 
 ### authenticate
 
-This method can be used to determine whether valid API URL base, public key, and shared secret values have been provided - and the Credit Key API is up and reachable.  A boolean is returned.
+This method can be used to determine whether valid public key and shared secret values have been provided - and the Credit Key API is up and reachable.  A boolean is returned.
 
 ```
 $isSuccessful = \CreditKey\Authentication::authenticate();
@@ -216,7 +246,7 @@ $isSuccessful = \CreditKey\Authentication::authenticate();
 This method should be called as the Checkout page is rendered, to determine whether or not to offer Credit Key as a payment option to the user. ```$cartContents``` should be an array of [\CreditKey\Models\CartItem](#cartitem), and ```$customerId``` should be the unique key on the merchant site to refer to this user if they are logged in.  For guest checkout, ```$customerId``` should be ```null```.
 
 ```
-$isDisplayed = Checkout::isDisplayedInCheckout($cartContents, $customerId);
+$isDisplayed = \CreditKey\Checkout::isDisplayedInCheckout($cartContents, $customerId);
 ```
 
 ### beginCheckout
