@@ -96,7 +96,6 @@ In the endpoint you setup to handle the [Return URL](#return-url), you should ta
 If your project uses the [Composer](https://getcomposer.org) dependency manager, you can include the Credit Key PHP SDK by executing the following from the command-line:
 
 ```
-% composer config repositories.creditkey composer https://composer.creditkey.com
 % composer require creditkey/b2bgateway
 ```
 
