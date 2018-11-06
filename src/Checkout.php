@@ -15,7 +15,7 @@
         }
 
         public static function beginCheckout($cartContents, $billingAddress, $shippingAddress,
-            $charges, $remoteId, $customerId, $returnUrl, $cancelUrl)
+            $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $mode)
         {
             if (is_null($cartContents) || is_null($billingAddress) || is_null($shippingAddress)
                 || is_null($charges) || is_null($remoteId) || is_null($returnUrl) || is_null($cancelUrl))
@@ -31,7 +31,8 @@
                 'remote_id' => $remoteId,
                 'remote_customer_id' => $customerId,
                 'return_url' => $returnUrl,
-                'cancel_url' => $cancelUrl
+                'cancel_url' => $cancelUrl,
+                'mode' => $mode
             );
 
             $result = \CreditKey\Api::post('/ecomm/begin_checkout', $formData);
