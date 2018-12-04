@@ -20,8 +20,9 @@
 
         public function testUpdateOrder()
         {
-            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::confirmedOrder();
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
             $merchantOrderStatus = 'test_status';
+            $merchantOrderId = (string) rand();
             $charges = new \CreditKey\Models\Charges(99.99, 9.99, 9.99, 0, 119.97);
             $shippingAddress = new \CreditKey\Models\Address('Test', 'Tester', null, 'testtester@creditkey.com',
                 '100 Main Street', 'Apt A', 'New York', 'NY', '10017', '212-555-1212');
@@ -29,7 +30,7 @@
             $newCartItem = new \CreditKey\Models\CartItem('999999', 'Test Adapter', 10.99, '9898928232', 1, null, null);
             array_push($cartContents, $newCartItem);
 
-            $order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, null, $cartContents, $charges, $shippingAddress);
+            $order = \CreditKey\Orders::update($ckOrderId, $merchantOrderStatus, $merchantOrderId, $cartContents, $charges, $shippingAddress);
 
             $this->assertEquals($merchantOrderStatus,
                 $order->getMerchantStatus());
@@ -37,7 +38,7 @@
                 $order->getAmount());
             $this->assertEquals($shippingAddress->getEmail(),
                 $order->getShippingAddress()->getEmail());
-            $this->assertNotEquals(null,
+            $this->assertEquals($merchantOrderId,
                 $order->getMerchantOrderId());
 
             $updatedCartItems = $order->getItems();
@@ -57,7 +58,7 @@
 
         public function testFindOrderByMerchantId()
         {
-            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::confirmedOrder();
+            $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
             $originalOrder = \CreditKey\Orders::find($ckOrderId);
 
             $order = \CreditKey\Orders::findByMerchantOrderId($originalOrder->getMerchantOrderId());

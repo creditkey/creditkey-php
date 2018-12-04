@@ -39,6 +39,7 @@
             curl_setopt($curl, CURLOPT_URL, $fullUrl);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $result = self::executeAndDecode($curl);
+
             return $result;
         }
 
