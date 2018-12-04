@@ -262,11 +262,12 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$customerId** - Optional - a unique ID in the merchant application to refer to the user, if the user is logged in.  Can be ```null```.
 * **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. See the section on the [Return Url](#return-url) for additional information.
 * **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the s3ection on the [Cancel URL](#cancel-url) for additional information.
+* **$mode** - Required - is the checkout mode; either 'modal' or 'redirect'.
 
 #### Example
 
 ```
-$redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl);
+$redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $mode);
 ```
 
 ### completeCheckout
