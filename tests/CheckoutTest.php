@@ -24,7 +24,7 @@
 
             $customerCheckoutUrl = \CreditKey\Checkout::beginCheckout($cartContents,
                 $billingAddress, $shippingAddress, $charges, $remoteId, $customerId,
-                $returnUrl, $cancelUrl);
+                $returnUrl, $cancelUrl, 'modal');
             $this->assertNotFalse(filter_var($customerCheckoutUrl, FILTER_VALIDATE_URL));
         }
 
@@ -50,7 +50,7 @@
 
             $customerCheckoutUrl = \CreditKey\Checkout::beginCheckout($cartContents,
                 $billingAddress, $shippingAddress, $charges, $remoteId, $customerId,
-                $returnUrl, $cancelUrl);
+                $returnUrl, $cancelUrl, 'modal');
         }
     }
 ?>
