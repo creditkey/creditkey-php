@@ -53,6 +53,8 @@ The Credit Key PHP SDK requires PHP 5.6 or higher, with the php_curl extension l
 
 [Credit Key](https://www.creditkey.com) checkout works similarly as services like [PayPal](https://www.paypal.com) in the sense that the user will be redirected to special checkout pages hosted on [creditkey.com](https://www.creditkey.com) to complete the checkout process.
 
+The Credit Key [Merchant Implementation Guide](https://github.com/creditkey/docs/blob/master/implementation-guide.md) guide should be reviewed before performing a merchant integration with Credit Key via SDK. It should familiarize you with the general requirements of a merchant implementation.
+
 When rendering your checkout page, you should always call [\CreditKey\Checkout::isDisplayedInCheckout](#isdisplayedincheckout) to determine whether or not to display Credit Key as a payment option.
 
 When the user selects Credit Key as a payment option on your checkout page, you will need to call [\CreditKey\Checkout::beginCheckout](#begincheckout).  Using this method you will send information about the order to Credit Key, such as the items in the user's shopping cart, the total amount to be billed, the billing and shipping addresses specified by the user in checkout, and so forth.  This method will return a unique [creditkey.com](https://www.creditkey.com) URL which you should redirect the user's browser to, in order for them to complete the checkout process.
