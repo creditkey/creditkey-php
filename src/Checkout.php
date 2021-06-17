@@ -15,7 +15,7 @@
         }
 
         public static function beginCheckout($cartContents, $billingAddress, $shippingAddress,
-            $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $mode)
+            $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode)
         {
             if (is_null($cartContents) || is_null($billingAddress) || is_null($shippingAddress)
                 || is_null($charges) || is_null($remoteId) || is_null($returnUrl) || is_null($cancelUrl))
@@ -32,6 +32,7 @@
                 'remote_customer_id' => $customerId,
                 'return_url' => $returnUrl,
                 'cancel_url' => $cancelUrl,
+                'order_complete_url' => $orderCompleteUrl,
                 'mode' => $mode
             );
 

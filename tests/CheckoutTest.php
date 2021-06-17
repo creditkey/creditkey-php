@@ -21,10 +21,11 @@
             $customerId = (string) rand();
             $returnUrl = 'http://www.myteststore.com/return_path_here';
             $cancelUrl = 'http://www.myteststore.com/cancel_path_here';
+            $orderCompleteUrl = 'http://www.myteststore.com/order_complete_path_here';
 
             $customerCheckoutUrl = \CreditKey\Checkout::beginCheckout($cartContents,
                 $billingAddress, $shippingAddress, $charges, $remoteId, $customerId,
-                $returnUrl, $cancelUrl, 'modal');
+                $returnUrl, $cancelUrl, $orderCompleteUrl, 'modal');
             $this->assertNotFalse(filter_var($customerCheckoutUrl, FILTER_VALIDATE_URL));
         }
 
