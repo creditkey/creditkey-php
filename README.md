@@ -262,6 +262,7 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$customerId** - Optional - a unique ID in the merchant application to refer to the user, if the user is logged in.  Can be ```null```.
 * **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. See the section on the [Return Url](#return-url) for additional information.
 * **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the s3ection on the [Cancel URL](#cancel-url) for additional information.
+* **$orderCompleteUrl** - Optional - a URL on the merchant site that Credit Key will use to place an order on behalf of a customer after the customer has been administratively approved for a line of credit This url should not require any borrower client state to place the order.
 * **$mode** - Required - is the checkout mode; either 'modal' or 'redirect'.
 
 #### Example
