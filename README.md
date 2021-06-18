@@ -8,6 +8,7 @@
 - [Return to Merchant after Credit Key Checkout](#return-to-merchant-after-credit-key-checkout)
     - [Return URL](#return-url)
     - [Cancel URL](#cancel-url)
+    - [Order Complete URL](#order-complete-url)
     - [Actions Upon Return](#actions-upon-return)
 - [Getting Started](#getting-started)
     - [With Composer](#with-composer)
@@ -53,6 +54,8 @@ The Credit Key PHP SDK requires PHP 5.6 or higher, with the php_curl extension l
 
 [Credit Key](https://www.creditkey.com) checkout works similarly as services like [PayPal](https://www.paypal.com) in the sense that the user will be redirected to special checkout pages hosted on [creditkey.com](https://www.creditkey.com) to complete the checkout process.
 
+The Credit Key [Merchant Implementation Guide](https://github.com/creditkey/docs/blob/master/implementation-guide.md) guide should be reviewed before performing a merchant integration with Credit Key via SDK. It should familiarize you with the general requirements of a merchant implementation.
+
 When rendering your checkout page, you should always call [\CreditKey\Checkout::isDisplayedInCheckout](#isdisplayedincheckout) to determine whether or not to display Credit Key as a payment option.
 
 When the user selects Credit Key as a payment option on your checkout page, you will need to call [\CreditKey\Checkout::beginCheckout](#begincheckout).  Using this method you will send information about the order to Credit Key, such as the items in the user's shopping cart, the total amount to be billed, the billing and shipping addresses specified by the user in checkout, and so forth.  This method will return a unique [creditkey.com](https://www.creditkey.com) URL which you should redirect the user's browser to, in order for them to complete the checkout process.
@@ -79,6 +82,10 @@ We recommend creating a session-specific URL for each request that contains iden
 ### Cancel URL
 
 Credit Key will redirect users to the Cancel URL when checkout was not completed successfully - such as when the user canceled the Credit Key checkout session, or if the user was not able to be approved for a loan.  In many cases, you can simply provide the URL to your checkout page for the Cancel URL.  But if you want to take another action besides going back to the checkout page, or perform tracking, you can redirect elsewhere.
+
+### Order Complete URL
+
+The Order Complete URL will be a URL on your system that Credit Key will use for pended applications. Orders can be administratively approved (in the event that the return_url is not applicable) for cleared applications. The order_complete_url should be set up specially for Credit Key to submit orders independently of the borrowers client state.
 
 ### Actions Upon Return
 
@@ -261,14 +268,14 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$remoteId** - Required - a unique ID in the merchant application to refer to this user's checkout session.  When Credit Key redirects back to the merchant site after a successful checkout, this ID will be referred to.
 * **$customerId** - Optional - a unique ID in the merchant application to refer to the user, if the user is logged in.  Can be ```null```.
 * **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. See the section on the [Return Url](#return-url) for additional information.
-* **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the s3ection on the [Cancel URL](#cancel-url) for additional information.
-* **$orderCompleteUrl** - Optional - a URL on the merchant site that Credit Key will use to place an order on behalf of a customer after the customer has been administratively approved for a line of credit This url should not require any borrower client state to place the order.
+* **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the section on the [Cancel URL](#cancel-url) for additional information.
+* **$orderCompleteUrl** - Optional - a URL that your system provides that Credit Key will use to administratively approved pended orders. See the section on the [Order Complete URL](#order-complete-url) for additional information.
 * **$mode** - Required - is the checkout mode; either 'modal' or 'redirect'.
 
 #### Example
 
 ```
-$redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $mode);
+$redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode);
 ```
 
 ### completeCheckout
