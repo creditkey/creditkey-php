@@ -12,7 +12,7 @@
                     'id' => $ckOrderId,
                     'merchant_order_id' => $merchantOrderId,
                     'merchant_status' => $merchantOrderStatus,
-                    'cart_contents' => CartContents::buildFormCartItems($cartContents),
+                    'cart_items' => CartContents::buildFormCartItems($cartContents),
                     'charges' => $charges->toFormData()
                 ));
             return Order::fromServiceData($result);
