@@ -49,6 +49,8 @@ You should have been put in contact with an Implementation Support Engineer at C
 
 The Credit Key PHP SDK requires PHP 5.6 or higher, with the php_curl extension loaded. Use of [Composer](https://getcomposer.org) is optional.
 
+> **Note for contributors:** Running the test suite requires PHP 8.3 or higher (imposed by the `phpunit/phpunit ^12.5` dev dependency). The SDK runtime itself remains compatible with PHP 5.6+.
+
 ## Overview
 -----------
 
