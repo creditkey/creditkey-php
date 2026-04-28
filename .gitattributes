@@ -8,3 +8,4 @@
 /.gitignore      export-ignore
 /.gitattributes  export-ignore
 /composer.lock   export-ignore
+/Dockerfile.test export-ignore
