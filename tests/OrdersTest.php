@@ -7,7 +7,9 @@
         public function testConfirm()
         {
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
-            $merchantOrderId = (string) rand();
+            // The fixture already sets a merchant_order_id and ck-web treats it as immutable
+            // once set, so reuse the existing value rather than generating a new one.
+            $merchantOrderId = \CreditKey\Orders::find($ckOrderId)->getMerchantOrderId();
             $merchantOrderStatus = 'pending';
             $cartContents = \CreditKey\TestSupport\CreditKeyTestData::cartContents();
             $charges = \CreditKey\TestSupport\CreditKeyTestData::charges();
@@ -16,13 +18,14 @@
                 $cartContents, $charges);
 
             $this->assertEquals('captured', $order->getCaptureStatus());
+            $this->assertEquals($merchantOrderId, $order->getMerchantOrderId());
         }
 
         public function testUpdateOrder()
         {
             $ckOrderId = \CreditKey\TestSupport\CreditKeyTestData::newOrder();
             $merchantOrderStatus = 'test_status';
-            $merchantOrderId = (string) rand();
+            $merchantOrderId = \CreditKey\Orders::find($ckOrderId)->getMerchantOrderId();
             $charges = new \CreditKey\Models\Charges(99.99, 9.99, 9.99, 0, 119.97);
             $shippingAddress = new \CreditKey\Models\Address('Test', 'Tester', null, 'testtester@creditkey.com',
                 '100 Main Street', 'Apt A', 'New York', 'NY', '10017', '212-555-1212');
