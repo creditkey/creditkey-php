@@ -67,11 +67,10 @@
             $this->assertNotEmpty($order->getStatus());
         }
 
-        /**
-         * @expectedException \CreditKey\Exceptions\NotFoundException
-         */
         public function testOrderNotFoundException()
         {
+            $this->expectException(\CreditKey\Exceptions\NotFoundException::class);
+
             \CreditKey\Orders::find('abcdefg');
         }
 
@@ -94,11 +93,10 @@
                 $order->getRefundedAmount());
         }
 
-        /**
-         * @expectedException \CreditKey\Exceptions\InvalidRequestException
-         */
         public function testExceptionThrownFindWithoutId()
         {
+            $this->expectException(\CreditKey\Exceptions\InvalidRequestException::class);
+
             \CreditKey\Orders::find(null);
         }
     }
