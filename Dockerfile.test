@@ -1,0 +1,40 @@
+# Image used by `bin/test` to run the SDK test suite against a locally-running
+# ck-web container. Built once and cached; rebuilt only when this file changes.
+#
+# The image bakes in:
+#   - PHP 8.3 CLI (required by phpunit ^12.5)
+#   - Composer (for installing dev dependencies inside the container)
+#   - docker CLI (used by the `bundle` shim below to exec into ck-web)
+#   - A `bundle` shim that proxies `bundle exec rake ...` calls from the
+#     SDK's test harness into the ck-web container, where Rails and the
+#     rake tasks actually live. Reads CK_WEB_CONTAINER from env at run time.
+FROM php:8.3-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        gnupg \
+        unzip \
+    && install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg \
+        -o /etc/apt/keyrings/docker.asc \
+    && chmod a+r /etc/apt/keyrings/docker.asc \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
+        > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends docker-ce-cli \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://getcomposer.org/installer \
+    | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN printf '%s\n' \
+    '#!/bin/bash' \
+    ': "${CK_WEB_CONTAINER:?CK_WEB_CONTAINER must be set}"' \
+    'exec docker exec -w /var/web/ck-web "$CK_WEB_CONTAINER" bundle "$@"' \
+    > /usr/local/bin/bundle \
+    && chmod +x /usr/local/bin/bundle
+
+WORKDIR /sdk

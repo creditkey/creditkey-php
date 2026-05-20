@@ -35,11 +35,10 @@
             $this->assertTrue(\CreditKey\Checkout::completeCheckout($ckOrderId));
         }
 
-        /**
-         * @expectedException \CreditKey\Exceptions\InvalidRequestException
-         */
         public function testExceptionThrownBeginCheckoutMissingArgs()
         {
+            $this->expectException(\CreditKey\Exceptions\InvalidRequestException::class);
+
             $cartContents = \CreditKey\TestSupport\CreditKeyTestData::cartContents();
             $billingAddress = \CreditKey\TestSupport\CreditKeyTestData::billingAddress();
             $shippingAddress = null;
@@ -49,9 +48,10 @@
             $returnUrl = 'http://www.myteststore.com/return_path_here';
             $cancelUrl = 'http://www.myteststore.com/cancel_path_here';
 
+            $orderCompleteUrl = null;
             $customerCheckoutUrl = \CreditKey\Checkout::beginCheckout($cartContents,
                 $billingAddress, $shippingAddress, $charges, $remoteId, $customerId,
-                $returnUrl, $cancelUrl, 'modal');
+                $returnUrl, $cancelUrl, $orderCompleteUrl, 'modal');
         }
     }
 ?>

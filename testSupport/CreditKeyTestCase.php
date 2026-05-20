@@ -5,7 +5,7 @@
 
     abstract class CreditKeyTestCase extends TestCase
     {
-        public static function setUpBeforeClass()
+        public static function setUpBeforeClass(): void
         {
             if (\CreditKey\Api::isConfigured())
             {

@@ -1,0 +1,11 @@
+# Files excluded from `git archive` — i.e., not shipped to consumers
+# of `composer require creditkey/creditkey-php`.
+/tests           export-ignore
+/testSupport     export-ignore
+/bin             export-ignore
+/phpunit.xml     export-ignore
+/TESTS.md        export-ignore
+/.gitignore      export-ignore
+/.gitattributes  export-ignore
+/composer.lock   export-ignore
+/Dockerfile.test export-ignore

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Run the SDK test suite against a locally-running ck-web container.
+#
+# Requirements:
+#   - Docker
+#   - ck-web running locally as container `ck-web-ck-web-1` (via ck-ecosystem)
+#
+# How it works:
+#   - Builds (or reuses) a tagged image from Dockerfile.test that contains
+#     PHP 8.3, composer, the docker CLI, and a `bundle` shim. Docker's layer
+#     cache makes subsequent runs nearly instant.
+#   - Runs the image with --network container:<ck-web> so the SDK's hardcoded
+#     LOCAL_DEVELOPMENT=http://localhost:9100 reaches ck-web's puma without
+#     code changes.
+#   - Mounts /var/run/docker.sock so the baked-in `bundle` shim can `docker
+#     exec` into ck-web for rake tasks. The mount grants root-equivalent host
+#     access to the container; this is a dev-only helper, not for CI.
+#
+# Pass extra phpunit args as positional arguments, e.g.:
+#   ./bin/test --filter testAuthenticate
+set -euo pipefail
+
+CK_WEB_CONTAINER="${CK_WEB_CONTAINER:-ck-web-ck-web-1}"
+IMAGE_TAG="creditkey-php-test:local"
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+if ! docker inspect -f '{{.State.Running}}' "$CK_WEB_CONTAINER" 2>/dev/null | grep -q true; then
+    echo "Error: container '$CK_WEB_CONTAINER' is not running." >&2
+    echo "Start ck-web first (see ck-ecosystem) or override with CK_WEB_CONTAINER=<name>." >&2
+    exit 1
+fi
+
+docker build -q \
+    -f "${REPO_ROOT}/Dockerfile.test" \
+    -t "$IMAGE_TAG" \
+    "$REPO_ROOT" >/dev/null
+
+docker run --rm -i \
+    --network "container:${CK_WEB_CONTAINER}" \
+    -v "${REPO_ROOT}:/sdk" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -e CREDITKEY_SOURCE_PATH=/tmp \
+    -e CK_WEB_CONTAINER="${CK_WEB_CONTAINER}" \
+    "$IMAGE_TAG" bash -c '
+        set -e
+        if [ ! -d vendor ]; then
+            composer install --no-interaction --no-progress
+        fi
+        exec ./vendor/bin/phpunit "$@"
+    ' bash "$@"
