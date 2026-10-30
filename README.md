@@ -273,12 +273,27 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the section on the [Cancel URL](#cancel-url) for additional information.
 * **$orderCompleteUrl** - Optional - a URL that your system provides that Credit Key will use to administratively approved pended orders. See the section on the [Order Complete URL](#order-complete-url) for additional information.
 * **$mode** - Required - is the checkout mode; either 'modal' or 'redirect'.
+* **$merchantData** - Optional - an associative array of merchant data to include as `merchant_data` in the checkout request. Defaults to `null`; omitting this argument or passing `null` leaves the field out of the request, preserving existing checkout behavior.
 
 #### Example
 
 ```
 $redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode);
 ```
+
+#### Pay by Bank
+
+To initiate Pay by Bank checkout, pass `array('pay_now' => true)` as the final argument:
+
+```php
+$redirectUrl = \CreditKey\Checkout::beginCheckout(
+    $cartContents, $billingAddress, $shippingAddress, $charges, $remoteId,
+    $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode,
+    array('pay_now' => true)
+);
+```
+
+This adds `"merchant_data": {"pay_now": true}` to the `/ecomm/begin_checkout` JSON request. Use the boolean `true`, not the string `'true'`. The existing ten-argument call remains supported.
 
 ### completeCheckout
 
