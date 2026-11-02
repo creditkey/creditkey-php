@@ -27,7 +27,7 @@ The checkout request tests run without a Credit Key API server or credentials:
 % ./vendor/bin/phpunit tests/CheckoutRequestTest.php
 ```
 
-These tests run in isolated processes and intercept cURL calls to inspect the JSON produced by the real SDK request builder. They cover optional merchant data, Pay by Bank's boolean flag, and compatibility with existing checkout calls.
+These tests run in isolated processes and intercept cURL calls to inspect the JSON produced by the real SDK request builder. They cover legacy eight- and nine-argument calls (including modal and redirect modes), current ten- and eleven-argument calls with populated, empty, or null callback URLs, required-input validation, and optional merchant data with Pay by Bank's boolean flag. Legacy calls are checked against their historical payload shape; the tests do not run complete Magento installations or contact the live API.
 
 If you have PHP 8.3+ and the Credit Key API installed directly on your host:
 
