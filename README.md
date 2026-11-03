@@ -271,14 +271,42 @@ This method should be called when the user selects Credit Key as a payment optio
 * **$customerId** - Optional - a unique ID in the merchant application to refer to the user, if the user is logged in.  Can be ```null```.
 * **$returnUrl** - Required - a unique URL on the merchant site that Credit Key will redirect the user's browser to upon successful checkout. See the section on the [Return Url](#return-url) for additional information.
 * **$cancelUrl** - Required - a URL on the merchant site that Credit Key will redirect the user's browser to if the Credit Key checkout failed, was declined, or canceled by the user.  See the section on the [Cancel URL](#cancel-url) for additional information.
-* **$orderCompleteUrl** - Optional - a URL that your system provides that Credit Key will use to administratively approved pended orders. See the section on the [Order Complete URL](#order-complete-url) for additional information.
-* **$mode** - Required - is the checkout mode; either 'modal' or 'redirect'.
+* **$orderCompleteUrl** - Optional - a URL that your system provides that Credit Key will use to administratively approved pended orders. Pass this as the ninth argument in the ten- or eleven-argument form, using `null` or `''` when unused. See the section on the [Order Complete URL](#order-complete-url) for additional information.
+* **$mode** - The checkout mode; either 'modal' or 'redirect'. Pass it as the tenth argument in the current signature, or the ninth argument in the legacy signature described below.
+* **$merchantData** - Optional - an associative array of merchant data to include as `merchant_data` in the checkout request. Defaults to `null`; omitting this argument or passing `null` leaves the field out of the request, preserving existing checkout behavior.
 
 #### Example
 
 ```
 $redirectUrl = \CreditKey\Checkout::beginCheckout($cartContents, $billingAddress, $shippingAddress, $charges, $remoteId, $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode);
 ```
+
+#### Pay by Bank
+
+To initiate Pay by Bank checkout, pass `array('pay_now' => true)` as the final argument:
+
+```php
+$redirectUrl = \CreditKey\Checkout::beginCheckout(
+    $cartContents, $billingAddress, $shippingAddress, $charges, $remoteId,
+    $customerId, $returnUrl, $cancelUrl, $orderCompleteUrl, $mode,
+    array('pay_now' => true)
+);
+```
+
+This adds `"merchant_data": {"pay_now": true}` to the `/ecomm/begin_checkout` JSON request. Use the boolean `true`, not the string `'true'`. Always use the full eleven-argument form to send merchant data, including the `$orderCompleteUrl` and `$mode` positions.
+
+#### Legacy checkout compatibility
+
+Older integrations, including previous Magento 2 module versions, can continue using their existing positional calls. The first eight arguments are unchanged, ending with `$cancelUrl` (`$customerId` must still occupy its position, even when `null`).
+
+| Argument count | Arguments after `$cancelUrl` | Request behavior |
+| --- | --- | --- |
+| 8 | None | Omits `order_complete_url`, `mode`, and `merchant_data`, preserving the original API defaults. |
+| 9 | `$mode` | Sends the ninth argument as `mode`; omits `order_complete_url` and `merchant_data`. |
+| 10 | `$orderCompleteUrl`, `$mode` | Sends both fields unchanged, including empty or null callback values; omits `merchant_data`. |
+| 11 | `$orderCompleteUrl`, `$mode`, `$merchantData` | Same as ten arguments, plus `merchant_data` when non-null. |
+
+A nine-argument call always treats its last argument as the legacy mode. To supply an order-complete callback, use the ten- or eleven-argument form.
 
 ### completeCheckout
 

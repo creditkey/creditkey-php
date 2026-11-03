@@ -20,6 +20,15 @@ The first run builds the image (~1 min); subsequent runs reuse Docker's layer ca
 
 ## Manual (host PHP)
 
+The checkout request tests run without a Credit Key API server or credentials:
+
+```
+% composer install
+% ./vendor/bin/phpunit tests/CheckoutRequestTest.php
+```
+
+These tests run in isolated processes and intercept cURL calls to inspect the JSON produced by the real SDK request builder. They cover legacy eight- and nine-argument calls (including modal and redirect modes), current ten- and eleven-argument calls with populated, empty, or null callback URLs, required-input validation, and optional merchant data with Pay by Bank's boolean flag. Legacy calls are checked against their historical payload shape; the tests do not run complete Magento installations or contact the live API.
+
 If you have PHP 8.3+ and the Credit Key API installed directly on your host:
 
 Set the path to the API source using the environment variable ```CREDITKEY_SOURCE_PATH```.  This path is used to run rake tasks from that directory.
